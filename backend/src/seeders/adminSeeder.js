@@ -6,7 +6,7 @@ const createAdminUser = async () => {
     await sequelize.authenticate();
     console.log('Database connected successfully.');
 
-    // Check if admin already exists
+  
     const existingAdmin = await User.findOne({ 
       where: { email: 'admin@wepresent.com' } 
     });
@@ -16,19 +16,19 @@ const createAdminUser = async () => {
       return;
     }
 
-    // Create admin user
+
     const adminUser = await User.create({
       name: 'System Administrator',
       email: 'admin@wepresent.com',
-      password: 'Admin123!', // Default password
+      password: 'Admin123!', 
       role: 'admin',
       isActive: true
     });
 
-    console.log('✅ Admin user created successfully!');
-    console.log('📧 Email:admin@wepresent.com');
-    console.log('🔑 Password:Admin123!');
-    console.log('⚠️  Please change the password after first login!');
+    console.log('Admin user created successfully!');
+    console.log('Email:admin@wepresent.com');
+    console.log('Password:Admin123!');
+    console.log('Please change the password after first login!');
 
   } catch (error) {
     console.error('Error creating admin user:', error);
@@ -37,5 +37,5 @@ const createAdminUser = async () => {
   }
 };
 
-// Run seeder
+
 createAdminUser();

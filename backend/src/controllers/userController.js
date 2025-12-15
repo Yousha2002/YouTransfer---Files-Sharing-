@@ -1,25 +1,27 @@
-const { User, Transfer, File } = require('../models');
-const bcrypt = require('bcryptjs');
+const { User, Transfer, File } = require("../models");
+const bcrypt = require("bcryptjs");
 
 exports.getUserProfile = async (req, res) => {
   try {
     const user = await User.findByPk(req.user.id, {
-      attributes: { exclude: ['password'] },
-      include: [{
-        model: Transfer,
-        include: [File],
-        order: [['createdAt', 'DESC']],
-        limit: 5
-      }]
+      attributes: { exclude: ["password"] },
+      include: [
+        {
+          model: Transfer,
+          include: [File],
+          order: [["createdAt", "DESC"]],
+          limit: 5,
+        },
+      ],
     });
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     res.json(user);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -28,37 +30,36 @@ exports.updateUserProfile = async (req, res) => {
     const { name, email } = req.body;
     const userId = req.user.id;
 
-    // Check if email is already taken by another user
     if (email) {
       const existingUser = await User.findOne({
-        where: { email, id: { [Op.ne]: userId } }
+        where: { email, id: { [Op.ne]: userId } },
       });
 
       if (existingUser) {
-        return res.status(400).json({ message: 'Email already taken' });
+        return res.status(400).json({ message: "Email already taken" });
       }
     }
 
     const user = await User.findByPk(userId);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     await user.update({
       name: name || user.name,
-      email: email || user.email
+      email: email || user.email,
     });
 
     const updatedUser = await User.findByPk(userId, {
-      attributes: { exclude: ['password'] }
+      attributes: { exclude: ["password"] },
     });
 
     res.json({
-      message: 'Profile updated successfully',
-      user: updatedUser
+      message: "Profile updated successfully",
+      user: updatedUser,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -69,22 +70,23 @@ exports.changePassword = async (req, res) => {
 
     const user = await User.findByPk(userId);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
-    // Verify current password
-    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    const isCurrentPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
     if (!isCurrentPasswordValid) {
-      return res.status(400).json({ message: 'Current password is incorrect' });
+      return res.status(400).json({ message: "Current password is incorrect" });
     }
 
-    // Update password
     user.password = newPassword;
     await user.save();
 
-    res.json({ message: 'Password changed successfully' });
+    res.json({ message: "Password changed successfully" });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -94,33 +96,35 @@ exports.getUserStats = async (req, res) => {
 
     const totalTransfers = await Transfer.count({ where: { userId } });
     const totalFiles = await File.count({
-      include: [{
-        model: Transfer,
-        where: { userId }
-      }]
+      include: [
+        {
+          model: Transfer,
+          where: { userId },
+        },
+      ],
     });
     const activeTransfers = await Transfer.count({
       where: {
         userId,
         expiration: { [Op.gt]: new Date() },
-        isActive: true
-      }
+        isActive: true,
+      },
     });
 
     const recentTransfers = await Transfer.findAll({
       where: { userId },
       include: [File],
-      order: [['createdAt', 'DESC']],
-      limit: 5
+      order: [["createdAt", "DESC"]],
+      limit: 5,
     });
 
     res.json({
       totalTransfers,
       totalFiles,
       activeTransfers,
-      recentTransfers
+      recentTransfers,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };

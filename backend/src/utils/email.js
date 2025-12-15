@@ -1,87 +1,42 @@
+const nodemailer = require("nodemailer");
 
-
-const nodemailer = require('nodemailer');
-
-// Create transporter with Gmail configuration
 const createTransporter = () => {
   return nodemailer.createTransport({
-    service: 'gmail',
+    service: "gmail",
     auth: {
       user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS, // Gmail App Password
+      pass: process.env.EMAIL_PASS,
     },
     debug: true,
-    logger: true
+    logger: true,
   });
 };
 
-// Test email configuration
 exports.testEmailConfig = async () => {
   try {
     const transporter = createTransporter();
-    
+
     await transporter.verify();
-    console.log('✅ Email server is ready to send messages');
-    
+    console.log("✅ Email server is ready to send messages");
+
     return true;
   } catch (error) {
-    console.error('❌ Email configuration error:', error);
+    console.error("❌ Email configuration error:", error);
     return false;
   }
 };
 
-// Send password reset email
 exports.sendResetEmail = async (email, resetToken) => {
   try {
-    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
-    
-    // const mailOptions = {
-    //   from: `"WEPRESENT File Sharing" <${process.env.EMAIL_USER}>`,
-    //   to: email,
-    //   subject: 'Password Reset Request - WEPRESENT',
-    //   html: `
-    //     <!DOCTYPE html>
-    //     <html>
-    //     <head>
-    //         <style>
-    //             body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }
-    //             .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    //             .header { text-align: center; color: #7c3aed; }
-    //             .button { display: inline-block; padding: 12px 24px; background-color: #7c3aed; color: white; text-decoration: none; border-radius: 6px; margin: 20px 0; }
-    //             .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 12px; text-align: center; }
-    //         </style>
-    //     </head>
-    //     <body>
-    //         <div class="container">
-    //             <div class="header">
-    //                 <h1>WEPRESENT</h1>
-    //                 <h2>Password Reset Request</h2>
-    //             </div>
-    //             <p>Hello,</p>
-    //             <p>You requested to reset your password for your WEPRESENT account.</p>
-    //             <p>Click the button below to reset your password:</p>
-    //             <div style="text-align: center;">
-    //                 <a href="${resetUrl}" class="button">Reset Password</a>
-    //             </div>
-    //             <p>Or copy and paste this link in your browser:</p>
-    //             <p style="word-break: break-all; background: #f8f9fa; padding: 10px; border-radius: 5px;">${resetUrl}</p>
-    //             <p>This link will expire in 1 hour.</p>
-    //             <p>If you didn't request this password reset, please ignore this email.</p>
-    //             <div class="footer">
-    //                 <p>WEPRESENT - Secure File Sharing Platform</p>
-    //                 <p>This is an automated message, please do not reply to this email.</p>
-    //             </div>
-    //         </div>
-    //     </body>
-    //     </html>
-    //   `,
-    //   text: `Password Reset Request\n\nYou requested to reset your password for your WEPRESENT account.\n\nReset Link: ${resetUrl}\n\nThis link will expire in 1 hour.\n\nIf you didn't request this, please ignore this email.`
-    // };
-const mailOptions = {
-  from: `"YouTransfer File Sharing" <${process.env.EMAIL_USER}>`,
-  to: email,
-  subject: 'Password Reset Request - YouTransfer',
-  html: `
+    const resetUrl = `${
+      process.env.FRONTEND_URL || "http://localhost:3000"
+    }/reset-password?token=${resetToken}`;
+
+    const mailOptions = {
+      from: `"YouTransfer File Sharing" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "Password Reset Request - YouTransfer",
+      html: `
     <!DOCTYPE html>
     <html>
     <head>
@@ -267,31 +222,36 @@ const mailOptions = {
     </body>
     </html>
   `,
-  text: `PASSWORD RESET REQUEST - YouTransfer\n\nHello,\n\nYou requested to reset your password for your YouTransfer account.\n\nPlease click the following link to reset your password:\n${resetUrl}\n\nThis link will expire in 1 hour.\n\nIf you didn't request this password reset, please ignore this email or contact our support team if you have concerns.\n\nBest regards,\nYouTransfer Team`
-};
-    console.log('📧 Attempting to send email to:', email);
-    
+      text: `PASSWORD RESET REQUEST - YouTransfer\n\nHello,\n\nYou requested to reset your password for your YouTransfer account.\n\nPlease click the following link to reset your password:\n${resetUrl}\n\nThis link will expire in 1 hour.\n\nIf you didn't request this password reset, please ignore this email or contact our support team if you have concerns.\n\nBest regards,\nYouTransfer Team`,
+    };
+    console.log("📧 Attempting to send email to:", email);
+
     const transporter = createTransporter();
     const result = await transporter.sendMail(mailOptions);
-    
-    console.log('✅ Reset email sent successfully to:', email);
-    console.log('📨 Message ID:', result.messageId);
-    
+
+    console.log("✅ Reset email sent successfully to:", email);
+    console.log("📨 Message ID:", result.messageId);
+
     return true;
   } catch (error) {
-    console.error('❌ Error sending reset email:', error);
+    console.error("❌ Error sending reset email:", error);
     return false;
   }
 };
 
 // Send transfer notification email
-exports.sendTransferEmail = async (recipientEmail, downloadUrl, title, message) => {
+exports.sendTransferEmail = async (
+  recipientEmail,
+  downloadUrl,
+  title,
+  message
+) => {
   try {
-  const mailOptions = {
-  from: `"YouTransfer File Sharing" <${process.env.EMAIL_USER}>`,
-  to: recipientEmail,
-  subject: `📁 File Transfer: ${title || 'Files from YouTransfer'}`,
-  html: `
+    const mailOptions = {
+      from: `"YouTransfer File Sharing" <${process.env.EMAIL_USER}>`,
+      to: recipientEmail,
+      subject: `📁 File Transfer: ${title || "Files from YouTransfer"}`,
+      html: `
     <!DOCTYPE html>
     <html>
     <head>
@@ -349,15 +309,23 @@ exports.sendTransferEmail = async (recipientEmail, downloadUrl, title, message) 
                 
                 <p style="color: #456882; margin-bottom: 20px; font-size: 16px;">
                     You have received files via <strong>YouTransfer</strong>. 
-                    ${tittle ? `Shared by: <strong>${title}</strong>` : 'Someone has shared files with you.'}
+                    ${
+                      title
+                        ? `Shared by: <strong>${title}</strong>`
+                        : "Someone has shared files with you."
+                    }
                 </p>
                 
-                ${message ? `
+                ${
+                  message
+                    ? `
                 <div class="message-box">
                     <div class="message-label">📝 Message from sender:</div>
                     <div class="message-content">${message}</div>
                 </div>
-                ` : ''}
+                `
+                    : ""
+                }
                 
                 <div class="download-section">
                     <div class="download-title">Ready to Download Your Files</div>
@@ -394,16 +362,18 @@ exports.sendTransferEmail = async (recipientEmail, downloadUrl, title, message) 
     </body>
     </html>
   `,
-  text: `FILE TRANSFER - YouTransfer\n\nHello,\n\nYou have received files via YouTransfer.\n${message ? `Message from sender: ${message}\n\n` : ''}Download your files using this link:\n${downloadUrl}\n\nImportant: Download your files promptly as they will be automatically deleted.\n\nBest regards,\nYouTransfer Team`
-};
+      text: `FILE TRANSFER - YouTransfer\n\nHello,\n\nYou have received files via YouTransfer.\n${
+        message ? `Message from sender: ${message}\n\n` : ""
+      }Download your files using this link:\n${downloadUrl}\n\nImportant: Download your files promptly as they will be automatically deleted.\n\nBest regards,\nYouTransfer Team`,
+    };
 
     const transporter = createTransporter();
     const result = await transporter.sendMail(mailOptions);
-    
-    console.log('✅ Transfer email sent to:', recipientEmail);
+
+    console.log("✅ Transfer email sent to:", recipientEmail);
     return true;
   } catch (error) {
-    console.error('❌ Error sending transfer email:', error);
+    console.error("❌ Error sending transfer email:", error);
     return false;
   }
 };

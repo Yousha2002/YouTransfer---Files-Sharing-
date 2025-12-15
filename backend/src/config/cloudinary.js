@@ -1,5 +1,3 @@
-
-
 const cloudinary = require('cloudinary').v2;
 require('dotenv').config();
 
@@ -12,7 +10,7 @@ cloudinary.config({
 
 // Test Cloudinary configuration
 cloudinary.api.ping()
-  .then(result => console.log('✅ Cloudinary connected successfully'))
-  .catch(err => console.error('❌ Cloudinary connection failed:', err.message));
+  .then(result => console.log('Cloudinary connected successfully'))
+  .catch(err => console.error('Cloudinary connection failed:', err.message));
 
 module.exports = cloudinary;
