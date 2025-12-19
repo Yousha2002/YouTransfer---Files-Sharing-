@@ -297,7 +297,7 @@ Pakistan 🇵🇰
 </p>
 
 <p align="center">
-📧 Contact: yousha@example.com | 🔗 GitHub: github.com/youshashakeel
+📧 Contact: smyousha2002@gmail.com | 🔗 GitHub: github.com/Yousha2002
 </p>
 
 </div>
